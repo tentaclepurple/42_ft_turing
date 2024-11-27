@@ -47,17 +47,18 @@ object TuringMachineValidator {
     transitions: Map[String, List[Map[String, String]]]
   )
 
-  // main method is the entry point of the program
+  // main method is the entry point of the program.
   def main(args: Array[String]): Unit = { // Unit is equivalent to void in Java
     if (args.contains("--help") || args.contains("-h")) { // contains checks if an element is in a list
       println(showHelp()) 
     } else {
       validateArgs(args.toList) match { // calls the validateArgs method with the arguments array converted to a list
-        case Left(error) => println(s"Error: $error")  // if the result is a Left, print the error
+        case Left(error) => println(s"⛔ Error: $error")  // if the result is a Left, print the error
         case Right((jsonPath, input)) => // if the result is a Right, destructure the tuple
           processFile(jsonPath, input) match { // calls the processFile method with the JSON path and input
-            case Left(error) => println(s"Error: $error") // if the result is a Left, print the error
-            case Right(config) => println("Valid JSON file and input. Initializing Turing Machine") // if the result is a Right, print a success message
+            case Left(error) => println(s"⛔ Error: $error") // if the result is a Left, print the error
+            case Right(config) => 
+              println(s"🥳 Valid JSON file and input.\n🤖 Initializing Turing Machine with config:\n $config")
         }
       }
     }
@@ -65,7 +66,7 @@ object TuringMachineValidator {
 
     // Show help message
   def showHelp(): String =
-    """usage: ft_turing [-h] jsonfile input
+    """🚨 Usage: ft_turing [-h] jsonfile input
       |
       |positional arguments:
       | jsonfile    json description of the machine
@@ -120,40 +121,85 @@ object TuringMachineValidator {
     }
   }
 
-  // Validar JSON
+/*
+    Validate JSON
+    - Receives a JSON content and a file name
+    - Validates the JSON content
+    - Returns a TuringConfig object if the JSON content is valid
+    - Otherwise, returns an error message
+*/
   def validateJson(content: String, fileName: String): Either[ValidationError, TuringConfig] = {
-    Try(Json.parse(content)) match {
-      case Success(json) =>
-        for {
-          name <- (json \ "name").asOpt[String].toRight(JsonError("Campo 'name' faltante o inválido.")).filterOrElse(_ == fileName.split("/").last.stripSuffix(".json"), JsonError("El campo 'name' debe coincidir con el nombre del archivo."))
-          alphabet <- (json \ "alphabet").asOpt[List[String]].toRight(JsonError("Campo 'alphabet' faltante o inválido.")).filterOrElse(_.forall(_.length == 1), JsonError("Todos los símbolos en 'alphabet' deben ser de longitud 1."))
-          blank <- (json \ "blank").asOpt[String].toRight(JsonError("Campo 'blank' faltante o inválido.")).filterOrElse(alphabet.contains, JsonError("El campo 'blank' debe estar en 'alphabet'."))
-          states <- (json \ "states").asOpt[List[String]].toRight(JsonError("Campo 'states' faltante o inválido."))
-          initial <- (json \ "initial").asOpt[String].toRight(JsonError("Campo 'initial' faltante o inválido.")).filterOrElse(states.contains, JsonError("El estado inicial debe estar en 'states'."))
-          finals <- (json \ "finals").asOpt[List[String]].toRight(JsonError("Campo 'finals' faltante o inválido.")).filterOrElse(_.forall(states.contains), JsonError("Todos los estados finales deben estar en 'states'."))
-          transitions <- (json \ "transitions").asOpt[Map[String, List[Map[String, String]]]].toRight(JsonError("Campo 'transitions' faltante o inválido.")).filterOrElse(_.keys.forall(states.contains), JsonError("Las claves de 'transitions' deben ser estados válidos."))
-        } yield TuringConfig(name, alphabet, blank, states, initial, finals, transitions)
-      case Failure(_) => Left(JsonError("JSON inválido."))
+    Try(Json.parse(content)) match { // Try is used to handle exceptions. Json.parse parses a JSON string and returns a JsValue object. Match is used to handle the result of the Try
+      case Success(json) => // if the result is a Success
+        for { // for is used to chain operations that return an Either
+                // asOpt is used to convert a JsValue to an Option which means that if the JsValue is not a string,
+                      // it will return None instead of throwing an exception.
+                      // or Some is used to convert the Option to a Right.
+                // toRight is used to convert an Option to an Either.
+                // filterOrElse is used to filter the Option and return an error message if the condition is not met
+                // fileName.split("/").last.stripSuffix(".json") is used to extract the name of the file without the path and the extension
+          // name line is used to extract the value of the "name" key from the JSON object
+          name <- (json \ "name").asOpt[String].toRight(JsonError("Field 'name' is missing or invalid")).filterOrElse(_ == fileName.split("/").last.stripSuffix(".json"), JsonError("Field 'name' must match the file name."))
+                // forall is used to check if all elements of a list satisfy a condition
+          // alphabet line is used to extract the value of the "alphabet" key from the JSON object and check if all elements are of length 1
+          alphabet <- (json \ "alphabet").asOpt[List[String]].toRight(JsonError("Field 'alphabet' is missing or invalid.")).filterOrElse(_.forall(_.length == 1), JsonError("All elements in 'alphabet' must be of length 1."))
+                // alphabet.contains is used to check if a list contains an element
+          // blank line is used to extract the value of the "blank" key from the JSON object and check if it is in the alphabet
+          blank <- (json \ "blank").asOpt[String].toRight(JsonError("Field 'blank' is missing or invalid.")).filterOrElse(alphabet.contains, JsonError("The blank symbol must be in 'alphabet'."))
+          // states line is used to extract the value of the "states" key from the JSON object and check if all elements are strings and the initial state is in the states
+          states <- (json \ "states").asOpt[List[String]].toRight(JsonError("Field 'states' is missing or invalid."))
+          // initial line is used to extract the value of the "initial" key from the JSON object and check if it is in the states
+          initial <- (json \ "initial").asOpt[String].toRight(JsonError("Field 'initial' is missing or invalid.")).filterOrElse(states.contains, JsonError("The initial state must be in 'states'."))
+          // finals line is used to extract the value of the "finals" key from the JSON object and check if all elements are in the states
+          finals <- (json \ "finals").asOpt[List[String]].toRight(JsonError("Field 'finals' is missing or invalid.")).filterOrElse(_.forall(states.contains), JsonError("All final states must be in 'states'."))
+          // transitions line is used to extract the value of the "transitions" key from the JSON object and check if all keys are in the states
+          transitions <- (json \ "transitions").asOpt[Map[String, List[Map[String, String]]]].toRight(JsonError("Field 'transitions' is missing or invalid.")).filterOrElse(_.keys.forall(states.contains), JsonError("All keys in 'transitions' must be in 'states'."))
+        } yield TuringConfig(name, alphabet, blank, states, initial, finals, transitions) // if everything is valid, return a TuringConfig object
+      case Failure(_) => Left(JsonError("JSON inválido.")) // if the result is a Failure, return a Left with an error message
     }
   }
 
-  // Validar entrada
+/* 
+    Validate input
+    - Receives an input string and an alphabet
+    - Validates the input string
+    - Returns a Unit if the input string is valid
+    - Otherwise, returns an error message
+*/
   def validateInput(input: String, alphabet: List[String]): Either[ValidationError, Unit] = {
+        // toSet is used to convert a list to a set
+        // diff is used to get the difference between two sets
+        // mkString is used to convert a list to a string
+    // invalidChars line is used to get the characters in the input that are not in the alphabet
     val invalidChars = input.toSet.diff(alphabet.mkString.toSet)
-    Either.cond(invalidChars.isEmpty, (), InputError(s"Caracteres inválidos en la entrada: ${invalidChars.mkString(", ")}"))
+    // Either is used to return an error message if the invalidChars list is not empty
+    // cond is used to check a condition and return a Left with an error message if the condition is not met
+    Either.cond(invalidChars.isEmpty, (), InputError(s"Invalid characters in input: ${invalidChars.mkString(", ")}"))
   }
 
-  // Validar transiciones
+/* 
+    Validate transitions
+    - Receives transitions, an alphabet, and states
+    - Validates the transitions
+    - Returns a Unit if the transitions are valid
+    - Otherwise, returns an error message
+*/
   def validateTransitions(
-    transitions: Map[String, List[Map[String, String]]],
-    alphabet: List[String],
-    states: List[String]
-  ): Either[ValidationError, Unit] = {
-    val validActions = Set("LEFT", "RIGHT")
-
-    val errors = transitions.flatMap { case (state, rules) =>
-      rules.flatMap { rule =>
-        val missingKeys = List("read", "to_state", "write", "action").filterNot(rule.contains)
+    transitions: Map[String, List[Map[String, String]]], // transitions is a map with a string as a key and a list of maps as a value
+    alphabet: List[String], // alphabet is a list of strings
+    states: List[String] // states is a list of strings
+  ): Either[ValidationError, Unit] = { // Either is used to return an error message if the transitions are not valid or a Unit if they are valid
+    val validActions = Set("LEFT", "RIGHT") // validActions is a set with two strings
+    // flatMap is used to apply a function to all elements of a list and concatenate the results
+    // the result is a list of errors for each state
+    // case is used to destructure a tuple in a pattern match.
+        // state is the key of the map and rules is the value
+    val errors = transitions.flatMap { case (state, rules) => e
+      // rules is a list of maps 
+      rules.flatMap { rule => // flatMap is used to apply a function to all elements of a list and concatenate the results
+            // filter
+        // missingKeys line is used to get the keys that are missing in the rule
+        val missingKeys = List("read", "to_state", "write", "action").filterNot(rule.contains) 
         val invalidRead = rule.get("read").exists(!alphabet.contains(_))
         val invalidWrite = rule.get("write").exists(!alphabet.contains(_))
         val invalidState = rule.get("to_state").exists(!states.contains(_))
