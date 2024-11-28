@@ -1,0 +1,22 @@
+{
+	"name" : "unary_addOK",
+	"alphabet": [ "1", ".", "+", "=" ],
+	"blank" : ".",
+	"states" : [ "scan", "add_one", "HALT" ],
+	"initial" : "scan",
+	"finals" : [ "HALT" ],
+	"transitions" : {
+		"scan": [
+		{ "read": "1", "to_state": "scan", "write": "1", "action": "RIGHT"},
+		{ "read": ".", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+		{ "read": "=", "to_state": "HALT", "write": ".", "action": "RIGHT"},
+		{ "read": "+", "to_state": "add_one", "write": ".", "action": "RIGHT"}
+		],
+		"add_one": [
+		{ "read": "1", "to_state": "add_one", "write": "+", "action": "LEFT"},
+		{ "read": ".", "to_state": "add_one", "write": "1", "action": "RIGHT"},
+		{ "read": "=", "to_state": "HALT", "write": ".", "action": "LEFT"},
+		{ "read": "+", "to_state": "add_one", "write": ".", "action": "RIGHT"}
+		]
+		}
+	}
