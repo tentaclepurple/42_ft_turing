@@ -1,5 +1,3 @@
-// src/main/scala/turing/Executor.scala
-
 package turing
 
 import turing.Types._
@@ -32,51 +30,55 @@ object Executor {
     }.mkString("[", "", "]")
   }
 
+  @scala.annotation.tailrec
   def stepMachine(config: TuringConfig, state: TuringMachineState): Option[String] = {
     // Imprimir el estado actual de la cinta
     println(renderTape(state.tape, state.head))
 
-    // Comprobar si estamos en un estado final
+    // Verificar si estamos en un estado final
     if (config.finals.contains(state.state)) {
       val msg = s"Máquina detenida en estado final: ${state.state}"
       println(msg)
-      return Some(msg)
-    }
-
-    // Verificar límites de la cinta
-    if (state.head < 0 || state.head >= state.tape.length) {
+      Some(msg)
+    } 
+    // Verificar si la cabeza está fuera de los límites
+    else if (state.head < 0 || state.head >= state.tape.length) {
       val error = s"Error: La cabeza está fuera de los límites de la cinta (posición ${state.head})"
       println(error)
-      return Some(error)
-    }
+      Some(error)
+    } 
+    // Manejo de transiciones
+    else {
+      config.transitions.get(state.state) match {
+        case Some(rules) =>
+          val currentSymbol = state.tape(state.head)
+          rules.find(rule => rule("read") == currentSymbol) match {
+            case Some(rule) =>
+              println(s"(${state.state}, ${rule("read")}) -> (${rule("to_state")}, ${rule("write")}, ${rule("action")})")
 
-    // Obtener las transiciones para el estado actual
-    val nextState = for {
-      rules <- config.transitions.get(state.state) // Obtener las reglas del estado actual
-      currentSymbol = state.tape(state.head)       // Leer el símbolo actual
-      rule <- rules.find(_("read") == currentSymbol) // Encontrar una regla que coincida
-    } yield {
-      // Mostrar la transición aplicada
-      println(s"(${state.state}, ${rule("read")}) -> (${rule("to_state")}, ${rule("write")}, ${rule("action")})")
+              val newTape = state.tape.updated(state.head, rule("write"))
+              val newHead = rule("action") match {
+                case "LEFT"  => state.head - 1
+                case "RIGHT" => state.head + 1
+              }
 
-      // Actualizar la cinta y la cabeza
-      val newTape = state.tape.updated(state.head, rule("write"))
-      val newHead = rule("action") match {
-        case "LEFT"  => state.head - 1
-        case "RIGHT" => state.head + 1
+              val newState = TuringMachineState(newTape, newHead, rule("to_state"))
+              stepMachine(config, newState) // Llamada recursiva en posición de cola
+
+            case None =>
+              val msg = s"Bloqueo detectado: No se encontró transición válida desde el estado '${state.state}' con el símbolo '${currentSymbol}'"
+              println(msg)
+              Some(msg)
+          }
+
+        case None =>
+          val error = s"Error: No hay transiciones definidas para el estado '${state.state}'"
+          println(error)
+          Some(error)
       }
-
-      TuringMachineState(newTape, newHead, rule("to_state"))
-    }
-
-    nextState match {
-      case Some(newState) => stepMachine(config, newState)
-      case None =>
-        val msg = s"Bloqueo detectado: No se encontró transición válida desde el estado '${state.state}' con el símbolo '${state.tape(state.head)}'"
-        println(msg)
-        Some(msg)
     }
   }
+
 
   def runMachine(config: TuringConfig, input: String): Unit = {
     val initialTape = input.map(_.toString).toVector
