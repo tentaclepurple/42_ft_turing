@@ -1,10 +1,14 @@
 package turing
 
 import turing.Types._
+import turing.Art._
 
 object Executor {
   def renderMachineHeader(config: TuringConfig): String = {
     s"""
+
+	${sirAlan.stripMargin}                                                                              
+ 
     |********************************************************************************
     |*                                                                              *
     |* ${config.name}                                                               *
