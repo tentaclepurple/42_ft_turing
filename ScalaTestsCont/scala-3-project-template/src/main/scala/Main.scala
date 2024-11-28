@@ -1,13 +1,6 @@
-// src//main//scala//Main.scala
-
-package turing
-
-
 import scala.io.Source // allows to read files from the filesystem
 import scala.util.{Try, Success, Failure} // allows to handle exceptions and recover from them
 import play.api.libs.json._ // allows to parse JSON files
-import Executor._ // Importa funciones de ejecución
-import Types._   // Importa definiciones de tipos
 
 
 /* 
@@ -46,6 +39,15 @@ object TuringMachineValidator {
   case class JsonError(message: String) extends ValidationError
   case class InputError(message: String) extends ValidationError 
   
+  case class TuringConfig(
+    name: String,
+    alphabet: List[String],
+    blank: String,
+    states: List[String],
+    initial: String,
+    finals: List[String],
+    transitions: Map[String, List[Map[String, String]]]
+  )
 
   // main method is the entry point of the program.
   def main(args: Array[String]): Unit = { // Unit is equivalent to void in Java
@@ -58,8 +60,7 @@ object TuringMachineValidator {
           processFile(jsonPath, input) match { // calls the processFile method with the JSON path and input
             case Left(error) => println(s"⛔ Error: $error") // if the result is a Left, print the error
             case Right(config) => 
-              println(s"🥳 Valid JSON file and input.\n🤖 Initializing Turing Machine\n\n")
-              runMachine(config, input) // if the result is a Right, destructure the TuringConfig object and call the runMachine method
+              println(s"🥳 Valid JSON file and input.\n🤖 Initializing Turing Machine with config:\n $config")
         }
       }
     }
@@ -201,15 +202,15 @@ object TuringMachineValidator {
             // filter
         // missingKeys line is used to get the keys that are missing in the rule
         val missingKeys = List("read", "to_state", "write", "action").filterNot(rule.contains)
-        // get is used to get the value of a key from a map. exists(!alphabet.contains(_)) is used to check if the value is not in the alphabet
+		// get is used to get the value of a key from a map. exists(!alphabet.contains(_)) is used to check if the value is not in the alphabet
         val invalidRead = rule.get("read").exists(!alphabet.contains(_))
         val invalidWrite = rule.get("write").exists(!alphabet.contains(_))
         val invalidState = rule.get("to_state").exists(!states.contains(_))
         val invalidAction = rule.get("action").exists(!validActions.contains(_))
-        // List is used to create a list of errors
+		// List is used to create a list of errors
         val errors =
           missingKeys.map(key => s"Missing key '$key' in state '$state'.") ++
-          // if is used to check if the value is true and return a list of errors
+		  // if is used to check if the value is true and return a list of errors
           (if (invalidRead) List(s"Field 'read' contains an invalid symbol in state '$state'.") else Nil) ++
           (if (invalidWrite) List(s"Field 'write' contains an invalid symbol in state '$state'.") else Nil) ++
           (if (invalidState) List(s"Field 'to_state' contains an invalid state in state '$state'.") else Nil) ++
@@ -218,20 +219,8 @@ object TuringMachineValidator {
         errors // return the list of errors
       }
     }
-    // Either is used to return an error message if the errors list is not empty
-    // cond is used to check a condition and return a Left with an error message if the condition is not met
+	// Either is used to return an error message if the errors list is not empty
+	// cond is used to check a condition and return a Left with an error message if the condition is not met
     Either.cond(errors.isEmpty, (), JsonError(errors.mkString("\n")))
   }
-
-	// Ejecutar la máquina de Turing
-  /* def runMachine(config: TuringConfig, input: String): Unit = {
-    // Convertimos cada carácter del input a String
-    val initialTape = input.map(_.toString).toVector ++ Vector.fill(20)(config.blank)
-    val initialState = TuringMachineState(initialTape, head = 0, state = config.initial)
-
-    println(renderMachineHeader(config))
-    stepMachine(config, initialState)
-  } */
 }
-
-
