@@ -45,7 +45,7 @@ object Executor {
   }
 
   def extendTapeRight(tape: Vector[String], blank: String): Vector[String] = {
-    tape ++ Vector.fill(10)(blank)
+    tape ++ Vector.fill(1)(blank)
   }
 
   def extendTapeLeft(tape: Vector[String], blank: String): (Vector[String], Int) = {
@@ -117,7 +117,8 @@ object Executor {
   }
 
   def runMachine(config: TuringConfig, input: String): Unit = {
-    val initialTape = input.map(_.toString).toVector ++ Vector.fill(1)(config.blank)
+    //val initialTape = input.map(_.toString).toVector ++ Vector.fill(1)(config.blank)
+    val initialTape = input.map(_.toString).toVector
     val initialState = TuringMachineState(initialTape, head = 0, state = config.initial)
 
     println(renderMachineHeader(config))

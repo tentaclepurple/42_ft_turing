@@ -1,2 +1,5 @@
-[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /app/ScalaTests/target/scala-2.12/classes.bak[0m
-[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /app/ScalaTests/target/scala-2.12/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /mnt/c/Users/Iban/Dropbox/42urduliz/cursus/42_ft_turing/Ft_Turing_Project/target/scala-2.12/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /mnt/c/Users/Iban/Dropbox/42urduliz/cursus/42_ft_turing/Ft_Turing_Project/target/scala-2.12/classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /mnt/c/Users/Iban/Dropbox/42urduliz/cursus/42_ft_turing/Ft_Turing_Project/target/scala-2.12/classes.bak[0m

@@ -1,0 +1,24 @@
+1.+=|.|ABC|A|C|A1B.RB1B1RB+B1RB=C.RB.C.R|_1+1=
+
+1.+=|.|ABC|A|C|A1B.R, B1B1R, B+B1R, B=C.R, B.C.R|_1+1=
+
+
+{
+    "name": "unary_add_simple",
+    "alphabet": ["1", "+", "=", "."],
+    "blank": ".",
+    "states": ["A", "B", "C"],
+    "initial": "A",
+    "finals": ["C"],
+    "transitions": {
+		"A": [
+			{ "read": "1", "to_state": "B", "write": ".", "action": "RIGHT" }
+		],
+        "B": [
+            { "read": "1", "to_state": "B", "write": "1", "action": "RIGHT" },
+            { "read": "+", "to_state": "B", "write": "1", "action": "RIGHT" },
+            { "read": "=", "to_state": "C", "write": ".", "action": "RIGHT"},
+			{ "read": ".", "to_state": "C", "write": ".", "action": "RIGHT" }
+        ]
+    }
+}

@@ -60,9 +60,9 @@ object TuringMachineValidator {
             case Left(error) => println(s"⛔ Error: $error") // if the result is a Left, print the error
             case Right(config) => 
               println(s"\n\n🥳 Valid JSON file and input.\n🤖 Initializing Turing Machine\n\n")
-              Thread.sleep(1000)
-              println(s"\n${sirAlan}\n")
-              Thread.sleep(1000)
+              //Thread.sleep(1000)
+              //println(s"\n${sirAlan}\n")
+              //Thread.sleep(1000)
               runMachine(config, input) // if the result is a Right, destructure the TuringConfig object and call the runMachine method
         }
       }
