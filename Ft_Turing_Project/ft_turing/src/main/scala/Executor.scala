@@ -65,9 +65,9 @@ object Executor {
   def stepMachine(config: TuringConfig, state: TuringMachineState, printHeader: Boolean = true): Option[String] = {
     // Print the table header only once, at the beginning.
     if (printHeader) {
-      println("📜 TAPE                            🔽 CURRENT                         🔄 TRANSITION")
-      println("                                   State              Read            Next State       Write    Action")
-      println("-------------------------------------------------------------------------------------------------------")
+      println("📜 TAPE                                                         🔽 CURRENT                         🔄 TRANSITION")
+      println("                                                                State                  Read        Next State           Write    Action")
+      println("---------------------------------------------------------------------------------------------------------------------------------------")
     }
 
     if (config.finals.contains(state.state)) {
@@ -91,8 +91,8 @@ object Executor {
           val currentSymbol = workingTape(workingHead)
           rules.find(rule => rule("read") == currentSymbol) match {
             case Some(rule) =>
-              println(f"${renderedTape.split("\n")(0)}%-35s")
-              println(f"${renderedTape.split("\n")(1)}%-35s${state.state}%-20s${rule("read")}%-15s${rule("to_state")}%-17s${rule("write")}%-9s${rule("action")}%-10s")
+              println(f"${renderedTape.split("\n")(0)}%-65s")
+              println(f"${renderedTape.split("\n")(1)}%-65s${state.state}%-22s${rule("read")}%-13s${rule("to_state")}%-20s${rule("write")}%-9s${rule("action")}%-12s")
 
               val newTape = workingTape.updated(workingHead, rule("write"))
               val newHead = rule("action") match {

@@ -1,0 +1,78 @@
+{
+    "name": "MY_UTM_ADD",
+    "alphabet": ["1", "+", "=", ".", " ", "A", "B", "C", "a", "b", ">", "#", "_", "@"],
+    "blank": ".",
+    "states": [
+                "skip_intro",
+                "f_input",
+                "r_0_input",
+                "f_init-1",
+                "r_trans-1",
+                "r_tr_init-1",
+                "r_tr_init_if1-1",
+                "r_tr_init_if1_w.-1",
+                "HALT"
+            ],
+    "r_tr_init_if1_-1": [ "HALT"],
+    "initial": "skip_intro",
+    "finals": ["HALT"],
+    "transitions": {
+		"skip_intro": [
+			{ "read": "1", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "+", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "=", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": " ", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": ".", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "A", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "B", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "C", "to_state": "skip_intro", "write": "_", "action": "RIGHT" },
+            { "read": "a", "to_state": "f_input", "write": "a", "action": "RIGHT" }
+        ],
+        "f_input": [
+            { "read": "1", "to_state": "f_input", "write": "1", "action": "RIGHT" },
+            { "read": "+", "to_state": "f_input", "write": "+", "action": "RIGHT" },
+            { "read": "=", "to_state": "f_input", "write": "=", "action": "RIGHT" },
+            { "read": " ", "to_state": "f_input", "write": " ", "action": "RIGHT" },
+            { "read": ".", "to_state": "f_input", "write": ".", "action": "RIGHT" },
+            { "read": "A", "to_state": "f_input", "write": "A", "action": "RIGHT" },
+            { "read": "B", "to_state": "f_input", "write": "B", "action": "RIGHT" },
+            { "read": "C", "to_state": "f_input", "write": "C", "action": "RIGHT" },
+            { "read": "a", "to_state": "f_input", "write": "a", "action": "RIGHT" },
+            { "read": "b", "to_state": "f_input", "write": "b", "action": "RIGHT" },
+            { "read": ">", "to_state": "f_input", "write": ">", "action": "RIGHT" },
+            { "read": "_", "to_state": "f_input", "write": "_", "action": "RIGHT" },
+            { "read": "#", "to_state": "r_0_input", "write": "#", "action": "RIGHT" }
+        ],
+        "r_0_input": [
+           { "read": "1", "to_state": "f_init-1", "write": "_", "action": "LEFT" }
+        ],
+        "f_init-1": [
+            {"read": "#", "to_state": "f_init-1", "write": "#", "action": "LEFT"},
+            {"read": "1", "to_state": "f_init-1", "write": "1", "action": "LEFT"},
+            {"read": " ", "to_state": "f_init-1", "write": " ", "action": "LEFT"},
+            {"read": ".", "to_state": "f_init-1", "write": ".", "action": "LEFT"},
+            {"read": "A", "to_state": "f_init-1", "write": "A", "action": "LEFT"},
+            {"read": "=", "to_state": "f_init-1", "write": "=", "action": "LEFT"},
+            {"read": "+", "to_state": "f_init-1", "write": "+", "action": "LEFT"},
+            {"read": "B", "to_state": "f_init-1", "write": "B", "action": "LEFT"},
+            {"read": "C", "to_state": "f_init-1", "write": "C", "action": "LEFT"},
+            {"read": "b", "to_state": "f_init-1", "write": "b", "action": "LEFT"},
+            {"read": ">", "to_state": "f_init-1", "write": ">", "action": "LEFT"},
+            {"read": "a", "to_state": "r_trans-1", "write": "a", "action": "RIGHT"}
+        ],
+        "r_trans-1": [
+            {"read": "A", "to_state": "r_tr_init-1", "write": "A", "action": "RIGHT"}
+        ],
+        "r_tr_init-1": [
+            {"read": "1", "to_state": "r_tr_init_if1-1", "write": "1", "action": "RIGHT"}
+        ],
+        "r_tr_init_if1-1": [
+            {"read": "B", "to_state": "r_tr_init_if1-1", "write": "B", "action": "RIGHT"},
+            {"read": ".", "to_state": "r_tr_init_if1_w.-1", "write": ".", "action": "RIGHT"}
+        ], #Estoy en transicion init, he leido 1 en input, se que hay que cambiar 1 por . en el input
+        "r_tr_init_if1_w.-1": [
+            {"read": "A", "to_state": "HALT", "write": "A", "action": "RIGHT"}
+        ]
+        
+    }
+}
