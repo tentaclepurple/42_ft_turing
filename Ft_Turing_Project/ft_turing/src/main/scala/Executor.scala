@@ -65,9 +65,9 @@ object Executor {
   def stepMachine(config: TuringConfig, state: TuringMachineState, printHeader: Boolean = true): Option[String] = {
     // Print the table header only once, at the beginning.
     if (printHeader) {
-      println("📜 TAPE                                                         🔽 CURRENT                         🔄 TRANSITION")
-      println("                                                                State                  Read        Next State           Write    Action")
-      println("---------------------------------------------------------------------------------------------------------------------------------------")
+      println("📜 TAPE                                                         🔽 CURRENT                           🔄 TRANSITION")
+      println("                                                                State                       Read      Next State                   Write    Action")
+      println("--------------------------------------------------------------------------------------------------------------------------------------------------")
     }
 
     if (config.finals.contains(state.state)) {

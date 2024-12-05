@@ -217,8 +217,6 @@
             {"read": "_", "to_state": "HALT", "write": "_", "action": "RIGHT"},
             {"read": "#", "to_state": "HALT", "write": "#", "action": "RIGHT"},
             {"read": "@", "to_state": "HALT", "write": "@", "action": "RIGHT"}
-
         ]
-
     }
 }
