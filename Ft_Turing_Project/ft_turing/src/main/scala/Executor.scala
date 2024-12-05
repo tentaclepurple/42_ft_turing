@@ -92,7 +92,7 @@ object Executor {
           rules.find(rule => rule("read") == currentSymbol) match {
             case Some(rule) =>
               println(f"${renderedTape.split("\n")(0)}%-65s")
-              println(f"${renderedTape.split("\n")(1)}%-65s${state.state}%-22s${rule("read")}%-13s${rule("to_state")}%-20s${rule("write")}%-9s${rule("action")}%-12s")
+              println(f"${renderedTape.split("\n")(1)}%-65s${state.state}%-27s${rule("read")}%-10s${rule("to_state")}%-29s${rule("write")}%-9s${rule("action")}%-12s")
 
               val newTape = workingTape.updated(workingHead, rule("write"))
               val newHead = rule("action") match {
