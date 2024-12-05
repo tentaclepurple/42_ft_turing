@@ -11,3 +11,4 @@ For more information on the sbt-dotty plugin, see the
 scalac -cp "lib/*" Types.scala SirAlan.scala Executor.scala Main.scala
 
 scala -cp ".:lib/*" turing.TuringMachineValidator
+
