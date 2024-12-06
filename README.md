@@ -4,8 +4,7 @@ A functional implementation of a Turing Machine simulator in Scala, including a 
 
 ## 🌐 Try it Online! 
 
-<h2>🌐 Try it Online!</h2>
-<strong><a href="https://turingmachine.streamlit.app/" target="_blank">Live Demo: Turing Machine Simulator</a></strong>
+**[Live Demo: Turing Machine Simulator](https://turingmachine.streamlit.app/)** *(Ctrl+click to open in new tab)*
 
 ## Overview
 
