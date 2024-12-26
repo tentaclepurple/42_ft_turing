@@ -16,4 +16,10 @@ scala -cp ".:lib/*" turing.TuringMachineValidator
 
 ## run complexity calculator with sbt
 
-sbt:Ft_Turing> runMain turing.ComplexityAnalyzer src/main/resources/is_palindrome.json
+sbt:Ft_Turing>
+
+runMain turing.ComplexityAnalyzer src/main/resources/is_palindrome.json
+
+runMain turing.ComplexityAnalyzer src/main/resources/O2n.json
+
+runMain turing.ComplexityAnalyzer src/main/resources/is_palindrome.json

@@ -39,10 +39,10 @@ object ComplexityAnalyzer {
             )
             
             case "unary_sub" => List(
-            "11-1=",
-            "1111-11=",
-            "11111111-1111=",
-            "1111111111-11111="
+            "1-1=",
+            "111-111=",
+            "11111-11111=",
+            "1111111111-1111111111="
             )
             
             case "is_palindrome" => List(
@@ -96,59 +96,66 @@ object ComplexityAnalyzer {
         }
 
     private def analyzeComplexity(
-        results: List[ExecutionResult]
-        ): Option[ComplexityResult] = {
-        val growthRatios = results
-            .sliding(2)
-            .collect {
-            case List(a, b) => 
-                val stepRatio = b.steps.toDouble / a.steps
-                val inputRatio = b.inputLength.toDouble / a.inputLength
-                stepRatio / inputRatio
-            }
-            .toList
+      results: List[ExecutionResult]
+  ): Option[ComplexityResult] = {
+      val growthRatios = results
+          .sliding(2)
+          .collect {
+          case List(a, b) => 
+              val stepRatio = b.steps.toDouble / a.steps
+              val inputRatio = b.inputLength.toDouble / a.inputLength
+              stepRatio / inputRatio
+          }
+          .toList
 
-        val avgRatio = if (growthRatios.nonEmpty) growthRatios.sum / growthRatios.length else 0
+      val avgRatio = if (growthRatios.nonEmpty) growthRatios.sum / growthRatios.length else 0
 
-        println("\nGrowth ratios between consecutive inputs:")
-        growthRatios.zipWithIndex.foreach { case (ratio, i) =>
-            val a = results(i)
-            val b = results(i + 1)
-            println(f"n: ${a.inputLength}%2d → ${b.inputLength}%2d, steps: ${a.steps}%3d → ${b.steps}%3d, ratio: $ratio%.2f")
-        }
+      println("\nGrowth ratios between consecutive inputs:")
+      results.sliding(2).foreach {
+          case List(a, b) =>
+              println(f"n: ${a.inputLength}%2d → ${b.inputLength}%2d, steps: ${a.steps}%3d → ${b.steps}%3d, ratio: ${growthRatios(results.indexOf(a))}%.2f")
+          case _ => // handle other cases
+      }
 
-        val complexity = determineComplexity(results, avgRatio)
-        Option(ComplexityResult(complexity, results, avgRatio))
-        }
+      // Verificar si hay un patrón de crecimiento consistente
+      val hasIncreasingRatios = growthRatios.sliding(2).forall {
+          case List(a, b) => b >= a * 0.9  // Permite una pequeña variación
+          case _ => true
+      }
+
+      val complexity = determineComplexity(avgRatio, hasIncreasingRatios)
+      Option(ComplexityResult(complexity, results, avgRatio))
+  }
 
   private def determineComplexity(
-    results: List[ExecutionResult], 
-    avgRatio: Double
+      avgRatio: Double,
+      hasIncreasingRatios: Boolean
   ): String = {
-    avgRatio match {
-      case r if r <= 0.2 => "O(1)"         // constant
-      case r if r <= 1.1 => "O(n)"         // Lineal
-      case r if r <= 1.5 => "O(n log n)"   // logarithmic
-      case r if r <= 2.2 => "O(n²)"        // Quadratic
-      case _ => "O(n³)"                     // qubic
-    }
+      (avgRatio, hasIncreasingRatios) match {
+          case (r, _) if r <= 0.3 => "O(1)"        // Constant
+          case (r, _) if r <= 0.8 => "O(log n)"    // Logarithmic
+          case (r, _) if r <= 0.95 => "O(n)"       // Lineal
+          case (r, true) if r <= 1.3 => "O(n log n)"  // n log n
+          case (r, _) if r <= 2.0 => "O(n²)"       // Cuadratic
+          case _ => "O(2^n)"                       // Exponential
+      }
   }
 
-  private def printResults(analysis: ComplexityResult): Option[Unit] = {
-    Option {
-      println("\n🔍 Complexity Analysis:")
-      println("\nExecution results:")
-      analysis.executionResults.foreach { r =>
-        println(f"Input length: ${r.inputLength}%2d, Steps: ${r.steps}%3d")
-      }
-      println(s"\nComplexity appears to be: ${analysis.complexity}")
-      
-      println("\nExplanation:")
-      println("- Each step is one transition of the Turing machine")
-      println("- Input length is the number of symbols (excluding '=')")
-      println("- Complexity is determined by how the number of steps grows with input size")
+    private def printResults(analysis: ComplexityResult): Option[Unit] = {
+        Option {
+            println("\n🔍 Complexity Analysis:")
+            println("\nExecution results:")
+            analysis.executionResults.foreach { r =>
+                println(f"Input length: ${r.inputLength}%2d, Steps: ${r.steps}%3d")
+            }
+            println(s"\nComplexity appears to be: ${analysis.complexity}")
+            
+            println("\nExplanation:")
+            println("- Each step is one transition of the Turing machine")
+            println("- Input length is the number of symbols (excluding '=')")
+            println("- Complexity is determined by how the number of steps grows with input size")
+        }
     }
-  }
 
   implicit class TraverseOps[A](xs: List[A]) {
     def traverse[B](f: A => Option[B]): Option[List[B]] = {
