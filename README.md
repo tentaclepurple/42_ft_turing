@@ -58,14 +58,6 @@ The web interface (built with Streamlit) provides:
 - Pattern matching for state transitions
 - Type-safe representation of machine configurations
 
-## Academic Context
-
-This project is part of the curriculum at 42 School, focusing on:
-- Understanding theoretical computer science
-- Implementing complex algorithms
-- Working with formal language theory
-- Applying functional programming concepts
-
 ## Getting Started
 
 ### Prerequisites
